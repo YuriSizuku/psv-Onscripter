@@ -30,6 +30,11 @@
 #include <dirent.h>
 #endif
 
+#if defined(PSV)
+#include <psp2/paf/stdc.h>
+#define strcasecmp sce_paf_strcasecmp
+#endif
+
 #define IS_TWO_BYTE(x) \
         ( ((unsigned char)(x) > (unsigned char)0x80) && ((unsigned char)(x) !=(unsigned char) 0xff) )
 

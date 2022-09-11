@@ -1,0 +1,4 @@
+build/**
+./*.o
+vpkinstall/*.o
+builtin_dll/*.o

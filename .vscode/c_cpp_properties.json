@@ -1,0 +1,26 @@
+{
+    "env" : {
+        "vitasdk": "d:/AppExtend/SDK/psvsdk"
+    },
+    "configurations": [
+        {
+            "name": "vita",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${vitasdk}/include/**",
+                "${vitasdk}/arm-vita-eabi/include/**",
+                "${vitasdk}/share/gcc-arm-vita-eabi/samples/common/**"
+            ],
+            "defines": [
+                "PSV",
+                "PSV_MODULE"
+            ],
+            "compilerPath": "${vitasdk}/bin/arm-vita-eabi-gcc",
+            "compilerArgs": [],
+            "cStandard": "c99",
+            "cppStandard": "c++11",
+            "intelliSenseMode": "linux-gcc-arm"
+        }
+    ],
+    "version": 4
+}

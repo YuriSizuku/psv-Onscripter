@@ -757,14 +757,14 @@ void ONScripter::flushDirect( SDL_Rect &rect, int refresh_mode )
 		dst_rect = {
 			0,
 			0,
-			(int)(device_width / scale_ratio),
-			(int)(device_height / scale_ratio)
+			(int)(device_width ),
+			(int)(device_height )
 		};
 	}
 	else {
 		dst_rect = {
-			(int)((device_width / scale_ratio - screen_width) / 2),
-			(int)((device_height / scale_ratio - screen_height) / 2) ,
+			(int)((device_width - screen_width) / 2),
+			(int)((device_height - screen_height) / 2) ,
 			screen_width,
 			screen_height
 		};
