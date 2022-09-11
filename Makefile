@@ -90,7 +90,7 @@ LDFLAGS  +=  -lSceLibKernel_stub \
 	-lSceTouch_stub -ldl -lSceSysmodule_stub -ltaihen_stub \
 	-lSceShellSvc_stub -lSceAppMgr_stub -lSceAppUtil_stub \
 	-lScePromoterUtil_stub \
-	-lwebp -lSceSblSsMgr_stub -lpthread -lSceMotion_stub -lSceAudioIn_stub -lmodplug -lScePaf_stub
+	-lwebp -lSceSblSsMgr_stub -lpthread -lSceMotion_stub -lSceAudioIn_stub -lmodplug
 
 
 #include Makefile.onscripter

@@ -26,13 +26,9 @@
 #include "Utils.h"
 #include "coding2utf16.h"
 #include <bzlib.h>
+#include <strings.h>
 #if !defined(WIN32) && !defined(_WIN32) && !defined(MACOS9) && !defined(PSP) && !defined(__OS2__)
 #include <dirent.h>
-#endif
-
-#if defined(PSV)
-#include <psp2/paf/stdc.h>
-#define strcasecmp sce_paf_strcasecmp
 #endif
 
 #define IS_TWO_BYTE(x) \
@@ -279,7 +275,7 @@ int DirectReader::getRegisteredCompressionType( const char *file_name )
     
     RegisteredCompressionType *reg = root_registered_compression_type.next;
     while (reg){
-        if ( !strcmp( capital_name, reg->ext ) ) return reg->type;
+        if ( !strcasecmp( capital_name, reg->ext ) ) return reg->type;
 
         reg = reg->next;
     }

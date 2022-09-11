@@ -1,4 +1,4 @@
 build/**
-./*.o
+/*.o
 vpkinstall/*.o
 builtin_dll/*.o

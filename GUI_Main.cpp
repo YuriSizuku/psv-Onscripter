@@ -1364,11 +1364,13 @@ int unload_ui_start(string &rom_path) {
 	return 0;
 }
 
-
+#include <strings.h>
 int main() {
 
 	utils::printInfo("ONScripter-Jh for Vita version %s (Jh %s, %s, %d.%02d)\n", ONS_JH_VITA_VERSION, ONS_JH_VERSION, ONS_VERSION, NSC_VERSION / 100, NSC_VERSION % 100);
 	sceIoMkdir("ux0:data/onsemu", 0777);
+
+	// printf("############### strcasecmp %d\n", strcasecmp("adb", "AdB"));
 
 	vita2d_init();
 	vita2d_set_clear_color(BLACK);

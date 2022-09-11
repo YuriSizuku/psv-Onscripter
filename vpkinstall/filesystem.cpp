@@ -1,14 +1,10 @@
 #include "filesystem.h"
-#include <psp2/paf/stdc.h>
 #include <psp2/io/dirent.h>
 #include <psp2/io/fcntl.h>
 #include <psp2/io/stat.h>
-#include <string.h>
+#include <strings.h>
 #include <stdlib.h>
 #include <stdio.h>
-
-#define strcasecmp sce_paf_strcasecmp
-#define strncasecmp sce_paf_strncasecmp
 
 #define MAX_PATH_LENGTH 1024
 #define MAX_NAME_LENGTH 256
