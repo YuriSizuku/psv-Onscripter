@@ -129,8 +129,10 @@ extern "C" void playVideoIOS(const char *filename, bool click_flag, bool loop_fl
 #endif
 
 void parseOption(int argc, char *argv[]) {
-    while (argc > 0) {
-        if ( argv[0][0] == '-' ){
+    while (argc > 0) 
+    {
+        if ( argv[0][0] == '-' )
+        {
             if ( !strcmp( argv[0]+1, "h" ) || !strcmp( argv[0]+1, "-help" ) ){
                 optionHelp();
             }
@@ -243,7 +245,7 @@ extern "C"
             ONS_JH_VERSION, ONS_VERSION, NSC_VERSION / 100, NSC_VERSION % 100);
         for(int i=0; i<argc; i++)
 		{
-			printf("argv[%d] %s\n", i, argv[i]);
+			SDL_Log("## ons_main argv[%d] %s\n", i, argv[i]);
 		}
     #if defined(PSV)
         ons.setCompatibilityMode();
@@ -341,12 +343,11 @@ extern "C"
 }
 
 #ifndef PSV_STATIC
-#include "filesystem.h"
-#include "filesystem.cpp"
 int main(int argc, char *argv[])
 {
-    char *_argv[] = {
-        "app0:eboot.bin"
+    char *_argv[] = 
+    {
+        "app0:eboot.bin",
         "--fullscreen",
         "--fontcache",
         "--textbox",
@@ -373,28 +374,19 @@ extern "C"
     void _start() __attribute__ ((weak, alias("module_start")));
     int module_start(SceSize args, void *argp) 
     {
-        SDL_Log("onsjh module_start args=%d", args);
-        char *argv[] = {
-            "--fullscreen",
-            "--fontcache",
-            "--textbox",
-            "--root",
-            " ux0:/onsemu/120_chs",
-            "--touch-mode",
-             "use_front_only_touch"
-        };
+        SDL_Log("onsjh module_start args=%d\n", args);
         return SCE_KERNEL_START_SUCCESS;
     }
 
     int module_stop(SceSize args, void *argp) 
     {
-        SDL_Log("onsjh module_stop");
+        SDL_Log("onsjh module_stop\n");
         return SCE_KERNEL_STOP_SUCCESS;
     }
 
     int module_exit()
     {
-        SDL_Log("onsjh module_exit");
+        SDL_Log("onsjh module_exit\n");
         return SCE_KERNEL_STOP_SUCCESS;
     }
 }

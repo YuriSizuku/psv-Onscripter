@@ -11,13 +11,13 @@ endif()
 add_subdirectory(src/onsjh)
 add_subdirectory(src/onsjh_vitagui)
 
-project(vita_onscripter)
+project(VitaOns)
 include("${VITASDK}/share/vita.cmake" REQUIRED)
 
 ## Configuration options for this app
-set(VITA_APP_NAME "vita Onscripter")
-set(VITA_TITLEID  "PSVONSEMU")
-set(VITA_VERSION  "01.00")
+set(VITA_APP_NAME "Vita Ons")
+set(VITA_TITLEID  "VITAONSJH")
+set(VITA_VERSION  "00.31")
 
 # use this for custom target denpends
 set(VITA_PACK_ARGS 

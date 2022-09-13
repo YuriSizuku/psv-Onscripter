@@ -7,13 +7,17 @@
             "name": "vita",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${vitasdk}/include/**",
+                "${workspaceFolder}/src/",
+                "${vitasdk}/include/onsjh/simd/**",
+                "${vitasdk}/arm-vita-eabi/include/SDL2/**",
                 "${vitasdk}/arm-vita-eabi/include/**",
                 "${vitasdk}/share/gcc-arm-vita-eabi/samples/common/**"
             ],
             "defines": [
                 "PSV",
-                "PSV_MODULE"
+                "PSV_MODULE",
+                "USE_PARALLEL",
+                "USE_SIMD_ARM_NEON"
             ],
             "compilerPath": "${vitasdk}/bin/arm-vita-eabi-gcc",
             "compilerArgs": [],

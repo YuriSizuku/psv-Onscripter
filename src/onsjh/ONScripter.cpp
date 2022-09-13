@@ -42,7 +42,7 @@ extern "C" void waveCallback(int channel);
 #define FONT_FILE "default.ttf"
 #define REGISTRY_FILE "registry.txt"
 #define DLL_FILE "dll.txt"
-#define DEFAULT_ENV_FONT "����"
+#define DEFAULT_ENV_FONT "simhei"
 #define DEFAULT_AUTOMODE_TIME 1000
 
 #ifdef __OS2__
@@ -74,6 +74,10 @@ void ONScripter::calcRenderRect() {
     render_view_rect.y = (renderh - viewh) / 2;
     render_view_rect.w = vieww;
     render_view_rect.h = viewh;
+    // SDL_Log("## ONScripter::calcRenderRect(), render %d %d, render_view_rect%d %d %d %d\n", 
+    //     renderw, renderh,
+    //     render_view_rect.x, render_view_rect.y, 
+    //     render_view_rect.w, render_view_rect.h);
 }
 
 void ONScripter::setCaption(const char *title, const char *iconstr) {
@@ -94,7 +98,8 @@ void ONScripter::initSDL()
     /* ---------------------------------------- */
     /* Initialize SDL */
 
-    if ( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_AUDIO ) < 0 ){
+    if ( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_AUDIO ) < 0 )
+    {
         utils::printError("Couldn't initialize SDL: %s\n", SDL_GetError());
         exit(-1);
     }
@@ -115,33 +120,49 @@ void ONScripter::initSDL()
 #endif
     /* ---------------------------------------- */
     /* Initialize SDL */
-    if ( TTF_Init() < 0 ){
+    if ( TTF_Init() < 0 )
+    {
         utils::printError("can't initialize SDL TTF\n");
         exit(-1);
     }
 
     screen_bpp = 32;
-    
-#if (defined(IOS) || defined(ANDROID) || defined(WINRT) || defined(PSV))
+
     SDL_DisplayMode mode;
     SDL_GetDisplayMode(0, 0, &mode);
+
+#if (defined(IOS) || defined(ANDROID) || defined(WINRT) || defined(PSV))
+    // screen_width, screen_height, onscripterdefined screen metric
+    // screen_device_width, screen_device_height, scaled screen metric
+    SDL_Log("## SDL_DisplayMode mode %dx%d, script_screen %dx%d\n", 
+        mode.w, mode.h, screen_width, screen_height);
+
     int width;
     if (mode.w * screen_height > mode.h * screen_width)
+    {
         width = (mode.h*screen_width / screen_height) & (~0x01); // to be 2 bytes aligned
+    }
     else
+    {   
         width = mode.w;
+    }
     screen_width = width;
 #endif
-
     screen_height = screen_width*script_h.screen_height/script_h.screen_width;
-
-    screen_device_width  = screen_width;
-    screen_device_height = screen_height;
-
+    if(fullscreen_mode)
+    {
+        screen_device_width = mode.w;
+        screen_device_height = mode.h;
+    }
+    else
+    {
+        screen_device_width  = screen_width;
+        screen_device_height = screen_height;
+    }
     // use hardware scaling
     screen_ratio1 = 1;
     screen_ratio2 = 1;
-    screen_width  = script_h.screen_width;
+    screen_width  = script_h.screen_width; // restore script_width
     screen_height = script_h.screen_height;
     screen_scale_ratio1 = (float)screen_width / screen_device_width;
     screen_scale_ratio2 = (float)screen_height / screen_device_height;
@@ -165,40 +186,46 @@ void ONScripter::initSDL()
 #if SDL_VERSION_ATLEAST(2,0,1)
     window_flag |= SDL_WINDOW_ALLOW_HIGHDPI;
 #endif
-
+    device_height = mode.h;
+    device_width = mode.w;
     int window_x = SDL_WINDOWPOS_UNDEFINED, window_y = SDL_WINDOWPOS_UNDEFINED;
-	window = SDL_CreateWindow(NULL, window_x, window_y, screen_device_width, screen_device_height, window_flag);
-    if (window == NULL) {
+	window = SDL_CreateWindow(NULL, window_x, window_y, device_width, device_height, window_flag);
+
+    if (window == NULL) 
+    {
         utils::printError("Could not create window: %s\n", SDL_GetError());
         exit(-1);
     }
-	SDL_GetWindowSize(window, &device_width, &device_height);
 #if defined(PSV)
-	/*���ڻ�*/
-	screen_device_width = device_width;
-	screen_device_height = device_height;
-	/*ȫ��*/
-	if (fullscreen_mode) {
+	if (fullscreen_mode)
+    {
 		screen_device_width = 960;
 		screen_device_height = 544;
 	}
-	device_width = 960;
-	device_height = 544;
 	if (screen_scale_ratio1 > screen_scale_ratio2)
-		scale_ratio = (float)device_width / screen_width;
+    {
+        scale_ratio =  (float)screen_device_width / screen_width;;
+    }
 	else
-		scale_ratio = (float)device_height / screen_height;
-	/*���ô���ģʽ*/
-	if (touchMode)
-		SDL_SetWindowTitle(window, touchMode);
-	else
-		SDL_SetWindowTitle(window, "use_front_only_touch");
+    {
+        scale_ratio = (float)screen_device_height / screen_height;
+    }
+    // set this to make renderer output at 960x544, by SDL_SetWindowSize
+    screen_device_width = 960; // must be the same as vita screen
+    screen_device_height = 544;
+    
+	if (touchMode) SDL_SetWindowTitle(window, touchMode);
+	else SDL_SetWindowTitle(window, "use_front_only_touch");
 #endif
     Uint32 render_flag = SDL_RENDERER_ACCELERATED;
     if (vsync) render_flag |= SDL_RENDERER_PRESENTVSYNC;
     renderer = SDL_CreateRenderer(window, -1, render_flag);
 
-    SDL_RenderSetLogicalSize(renderer, screen_width, screen_height);
+    if(!fullscreen_mode)
+    {
+        // this is for center the content with different ratio
+        SDL_RenderSetLogicalSize(renderer, screen_width, screen_height);
+    }
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 
     calcRenderRect();
@@ -745,33 +772,23 @@ void ONScripter::flush( int refresh_mode, SDL_Rect *rect, bool clear_dirty_flag,
     if ( clear_dirty_flag ) dirty_rect.clear();
 }
 
-void ONScripter::flushDirect( SDL_Rect &rect, int refresh_mode )
+void ONScripter::flushDirect(SDL_Rect &rect, int refresh_mode)
 {
-    //utils::printInfo("flush %d: %d %d %d %d\n", refresh_mode, rect.x, rect.y, rect.w, rect.h );
-    
-    SDL_Rect dst_rect = rect;
+    // SDL_Log("## flushDirect refresh_mode=%d, rect(%d,%d,%d,%d)\n", refresh_mode, rect.x, rect.y, rect.w, rect.h );  
+    SDL_Rect dst_rect = {0, 0, 960, 544};
 #if defined(PSV)
-	if (fullscreen_mode) {
-		dst_rect = {
-			0,
-			0,
-			(Uint16)(device_width ),
-			(Uint16)(device_height )
-		};
+	if (!fullscreen_mode)  
+    {
+        //SDL_Log("## device %d %d, screen_device %d %d\n", device_width, device_height, screen_device_width,screen_device_height);
+        int x =(960 - screen_device_width)/2;
+        int y =(544 - screen_device_height)/2;
+		dst_rect = {x, y, screen_device_width, screen_device_height};
 	}
-	else {
-		dst_rect = {
-			(Sint16)((device_width - screen_width) / 2),
-			(Sint16)((device_height - screen_height) / 2) ,
-			(Uint16)screen_width,
-			(Uint16)screen_height
-		};
-	}
-	//utils::printInfo("xxx %d %d %d    %d %d %d %d\n", fullscreen_mode,screen_device_width, screen_width,dst_rect.x, dst_rect.y, dst_rect.w,dst_rect.h);
 #else
     --dst_rect.x; --dst_rect.y; dst_rect.w += 2; dst_rect.h += 2;
     if (AnimationInfo::doClipping(&dst_rect, &screen_rect) || (dst_rect.w == 2 && dst_rect.h == 2)) return;
 #endif
+
     refreshSurface(accumulation_surface, &rect, refresh_mode);
     SDL_LockSurface(accumulation_surface);
     SDL_UpdateTexture(texture, (SDL_Rect*)&rect, 
@@ -780,18 +797,20 @@ void ONScripter::flushDirect( SDL_Rect &rect, int refresh_mode )
     SDL_UnlockSurface(accumulation_surface);
 
     screen_dirty_flag = true;
-    #if defined(ANDROID) || defined(PSV)      
-        if (compatibilityMode) {
+#if defined(ANDROID) || defined(PSV)      
+        if (compatibilityMode) 
+        {
             SDL_RenderClear(renderer);
         }
 #if defined(PSV)
-		SDL_RenderCopy(renderer, texture, NULL, (SDL_Rect*)&dst_rect);
+        //SDL_Log("## ONScripter::flushDirect dst_rect(%d,%d,%d,%d)", dst_rect.x, dst_rect.y, dst_rect.w, dst_rect.h);
+		SDL_RenderCopy(renderer, texture, NULL, NULL);
 #else
         SDL_RenderCopy(renderer, texture, NULL, NULL);
 #endif
-    #else
+#else
         SDL_RenderCopy(renderer, texture, &dst_rect, &dst_rect);
-    #endif
+#endif
     SDL_RenderPresent(renderer);
 }
 
@@ -935,10 +954,9 @@ void ONScripter::warpMouse(int x, int y) {
 void ONScripter::setFullScreen(bool fullscreen) {
     if (fullscreen != fullscreen_mode) {
 #if defined(PSV)
-		/*���ڻ�*/
-		SDL_GetWindowSize(window, &screen_device_width, &screen_device_height);
-		/*ȫ��*/
-		if (fullscreen) {
+		//SDL_GetWindowSize(window, &screen_device_width, &screen_device_height);
+		if (fullscreen) 
+        {
 			screen_device_width = device_width;
 			screen_device_height = device_height;
 		}

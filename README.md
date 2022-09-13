@@ -1,15 +1,27 @@
 # ONScripter-jh-PSVita
+![psv-ons](https://img.shields.io/badge/psv-onscripter-brightgreen)  ![GitHub release (latest by date)](https://img.shields.io/github/v/release/Yurisizuku/psv-OnscripterJH?color=green&logoColor=red&style=flat-square)
 
 This is a ONScripter SDL 2.0 version, implemmented in psv.
 Maintained by Yurisizuku, optimizing code structure and adding more features.
 
-My other mod for enumlaters:
+- [x] make better structure by cmake
+- [x] fix bugs by updating vitasdk and render problems
+- [ ] fix the bug for joystick and touching event
+- [ ] ci in github  action to automaticly build
+- [ ] support `nt2`, `nt3` script format
+- [ ] support mpeg video
+- [ ] make compatible game list
+...
+
+![vitaons_test1](./screenshot/vitaons_test2.jpg)
+
+My other mod for emulators:
 [Mine_v1.5_yuri in andorid](https://github.com/YuriSizuku/Kirikiroid2/releases/download/1.3.9_yuri/Kirikiroid2_yuri_1.3.9.apk)
 [Krkrdorid in andorid](https://github.com/YuriSizuku/Kirikiroid2/releases/download/1.3.9_yuri/Kirikiroid2_yuri_1.3.9.apk)
 
 ## 1. build
 
-use these script to build and debug, I tested in windows msys sh.
+Instal [vitasdk](https://vitasdk.org/) first, and then use these script to build and debug. I tested it in windows msys sh enviroment.
 
 ```sh
 # build script

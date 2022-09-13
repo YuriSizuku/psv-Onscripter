@@ -4,7 +4,7 @@
  *
  *  Copyright (c) 2001-2016 Ogapee. All rights reserved.
  *            (C) 2014-2016 jh10001 <jh10001@live.cn>
- *            (C) 2019-2019 wetor(ÒÀ¾ÉWÈç´Ë) <maho.wang>
+ *            (C) 2019-2019 wetor(ï¿½ï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½) <maho.wang>
  *
  *  ogapee@aqua.dti2.ne.jp
  *
@@ -136,12 +136,12 @@ ONS_Key transJoystickButton(Uint8 button)
 {
 #if defined(PSV)    
 	SDL_Keycode button_map[] = {
-		SDLK_ESCAPE, /* TRIANGLE ²Ëµ¥*/
-		SDLK_RETURN, /* CIRCLE   È·ÈÏ*/
-		SDLK_RCTRL,  /* CROSS    °´×¡¿ì½ø*/
-		SDLK_a,		 /* SQUARE   ¿ªÆô×Ô¶¯*/
-		SDLK_o,      /* LTRIGGER ÏÔÊ¾µ±Ç°Ò³*/
-		SDLK_s,      /* RTRIGGER ¿ªÆô/¹Ø±Õ¿ì½ø*/
+		SDLK_ESCAPE, /* TRIANGLE ï¿½Ëµï¿½*/
+		SDLK_RETURN, /* CIRCLE   È·ï¿½ï¿½*/
+		SDLK_RCTRL,  /* CROSS    ï¿½ï¿½×¡ï¿½ï¿½ï¿½*/
+		SDLK_a,		 /* SQUARE   ï¿½ï¿½ï¿½ï¿½ï¿½Ô¶ï¿½*/
+		SDLK_o,      /* LTRIGGER ï¿½ï¿½Ê¾ï¿½ï¿½Ç°Ò³*/
+		SDLK_s,      /* RTRIGGER ï¿½ï¿½ï¿½ï¿½/ï¿½Ø±Õ¿ï¿½ï¿½*/
 		SDLK_DOWN,   /* DOWN     */
 		SDLK_LEFT,   /* LEFT     */
 		SDLK_UP,     /* UP       */
@@ -1190,7 +1190,6 @@ void ONScripter::timerEvent(bool init_flag)
 }
 
 #if (defined(IOS) || defined(ANDROID) || defined(WINRT) || defined(PSV))
-//TODO: ÉÏÏÂ×óÓÒ¼üÄ£Äâ
 SDL_MouseWheelEvent transTouchKey(SDL_TouchFingerEvent &finger) {
     static struct FingerPoint {
         float x, y;
@@ -1452,6 +1451,7 @@ void ONScripter::runEventLoop()
                   Mix_Resume(-1);
 #if defined(ANDROID) || defined(PSV) 
                   if (compatibilityMode) repaintCommand();
+                  // thats why window size changes !!!
                   SDL_SetWindowSize( window, screen_device_width, screen_device_height);
                   repaintCommand();
 #endif //ANDROID

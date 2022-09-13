@@ -3670,14 +3670,16 @@ int ONScripter::bltCommand()
         }
         src_rect.x -= blt_texture_src_rect.x;
         src_rect.y -= blt_texture_src_rect.y;
-#if defined(PSV)
-		if (fullscreen_mode) {
+#if  defined(PSV)
+		if (fullscreen_mode) 
+        {
 			dst_rect.x += 0;
 			dst_rect.y += 0;
 			dst_rect.w = (int)(device_width / scale_ratio);
 			dst_rect.h = (int)(device_height / scale_ratio);
 		}
-		else {
+		else 
+        {
 			dst_rect.x += render_view_rect.x;
 			dst_rect.y += render_view_rect.y;
 			dst_rect.w = blt_texture_src_rect.w;
