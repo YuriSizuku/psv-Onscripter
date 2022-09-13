@@ -1,12 +1,12 @@
 # ONScripter-jh-PSVita
 ![psv-ons](https://img.shields.io/badge/psv-onscripter-brightgreen)  ![GitHub release (latest by date)](https://img.shields.io/github/v/release/Yurisizuku/psv-OnscripterJH?color=green&logoColor=red&style=flat-square)
 
-This is a ONScripter SDL 2.0 version, implemmented in psv.
+This is a ONScripter SDL 2.0 version, implemmented in psv.  
 Maintained by Yurisizuku, optimizing code structure and adding more features.
 
 - [x] make better structure by cmake
-- [x] fix bugs by updating vitasdk and render problems
-- [ ] fix the bug for joystick and touching event
+- [x] fix bugs in new vitasdk and rendering problems
+- [ ] fix bugs for joystick and touching event
 - [ ] ci in github  action to automaticly build
 - [ ] support `nt2`, `nt3` script format
 - [ ] support mpeg video
@@ -16,8 +16,8 @@ Maintained by Yurisizuku, optimizing code structure and adding more features.
 ![vitaons_test1](./screenshot/vitaons_test2.jpg)
 
 My other mod for emulators:
-[Mine_v1.5_yuri in andorid](https://github.com/YuriSizuku/Kirikiroid2/releases/download/1.3.9_yuri/Kirikiroid2_yuri_1.3.9.apk)
-[Krkrdorid in andorid](https://github.com/YuriSizuku/Kirikiroid2/releases/download/1.3.9_yuri/Kirikiroid2_yuri_1.3.9.apk)
+[Mine_v1.5_yuri in andorid](https://github.com/YuriSizuku/Kirikiroid2/releases/download/1.3.9_yuri/Kirikiroid2_yuri_1.3.9.apk)  
+[Krkrdorid in andorid](https://github.com/YuriSizuku/Kirikiroid2/releases/download/1.3.9_yuri/Kirikiroid2_yuri_1.3.9.apk)  
 
 ## 1. build
 
@@ -34,11 +34,11 @@ sh build_vitavpk.sh all && sh send_vitaeboot.sh 10.2.12.6
 
 ## 2. usage
 
-see original informations
-
-Original informations  below:
+See original informations.  
 
 ------
+Original informations by [wetor](https://github.com/wetor/ONScripter-jh-PSVita).  
+Thank you for providing the code and makefiles to this project.
 
 ## 2019.3.3 上传部分源代码  
 
