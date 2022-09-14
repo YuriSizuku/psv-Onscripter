@@ -116,7 +116,7 @@ void ONScripter::leaveSystemCall( bool restore_flag )
         draw_cursor_flag = shelter_draw_cursor_flag;
         if ( event_mode & WAIT_BUTTON_MODE ){
             int x = shelter_mouse_state.x * screen_device_width / screen_width;
-            int y = shelter_mouse_state.y * screen_device_width / screen_width;
+            int y = shelter_mouse_state.y * screen_device_height / screen_height;
             warpMouse(x, y);
         }
     }

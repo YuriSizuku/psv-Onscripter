@@ -4,7 +4,7 @@
  *
  *  Copyright (c) 2001-2018 Ogapee. All rights reserved.
  *            (C) 2014-2018 jh10001 <jh10001@live.cn>
- *            (C) 2019-2019 wetor(ÒÀ¾ÉWÈç´Ë) <maho.wang>
+ *            (C) 2019-2019 wetor(ï¿½ï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½) <maho.wang>
  *
  *  ogapee@aqua.dti2.ne.jp
  *
@@ -137,7 +137,8 @@ void ONScripter::searchSaveFile( SaveFileInfo &save_file_info, int no )
 #elif defined(PSV)
 	sprintf(file_name, "%ssave%d.dat", save_dir ? save_dir : archive_path, no);
 	SceIoStat buf;
-	if (sceIoGetstat(file_name, &buf) < 0) {
+	if (sceIoGetstat(file_name, &buf) < 0)
+     {
 		save_file_info.valid = false;
 		return;
 	}

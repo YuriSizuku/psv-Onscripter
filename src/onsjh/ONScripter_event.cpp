@@ -4,7 +4,7 @@
  *
  *  Copyright (c) 2001-2016 Ogapee. All rights reserved.
  *            (C) 2014-2016 jh10001 <jh10001@live.cn>
- *            (C) 2019-2019 wetor(����W���) <maho.wang>
+ *            (C) 2019-2019 wetor(����W���?) <maho.wang>
  *
  *  ogapee@aqua.dti2.ne.jp
  *
@@ -136,18 +136,18 @@ ONS_Key transJoystickButton(Uint8 button)
 {
 #if defined(PSV)    
 	SDL_Keycode button_map[] = {
-		SDLK_ESCAPE, /* TRIANGLE �˵�*/
-		SDLK_RETURN, /* CIRCLE   ȷ��*/
-		SDLK_RCTRL,  /* CROSS    ��ס���*/
-		SDLK_a,		 /* SQUARE   �����Զ�*/
-		SDLK_o,      /* LTRIGGER ��ʾ��ǰҳ*/
-		SDLK_s,      /* RTRIGGER ����/�رտ��*/
+		SDLK_ESCAPE, /* TRIANGLE */
+		SDLK_RETURN, /* CIRCLE   */
+		SDLK_RCTRL,  /* CROSS    */
+		SDLK_a,		 /* SQUARE   */
+		SDLK_o,      /* LTRIGGER */
+		SDLK_s,      /* RTRIGGER */
 		SDLK_DOWN,   /* DOWN     */
 		SDLK_LEFT,   /* LEFT     */
 		SDLK_UP,     /* UP       */
 		SDLK_RIGHT,  /* RIGHT    */
 		SDLK_0,      /* SELECT   */
-		SDLK_SPACE,  /* START   ȴ */
+		SDLK_SPACE,  /* START    */
 		SDLK_UNKNOWN,/* HOME     */ /* kernel mode only */
 		SDLK_UNKNOWN,/* HOLD     */
 	};
@@ -425,25 +425,11 @@ bool ONScripter::trapHandler()
 /* **************************************** *
  * Event handlers
  * **************************************** */
-#if defined(PSV)
-bool ONScripter::mouseMoveEvent(SDL_MouseMotionEvent *event, bool is_finger = true)
-#else
 bool ONScripter::mouseMoveEvent( SDL_MouseMotionEvent *event )
-#endif
 {
+    // this is already wrapped into center
     current_button_state.x = event->x * screen_scale_ratio1;
     current_button_state.y = event->y * screen_scale_ratio2;
-#if defined(PSV)
-	if (fullscreen_mode && is_finger) {
-		int tmp_width, tmp_height;
-		SDL_GetWindowSize(window, &tmp_width, &tmp_height);
-		current_button_state.x = current_button_state.x * tmp_width / screen_device_width;
-		current_button_state.y = current_button_state.y * tmp_height / screen_device_height;
-		/*if ((float)screen_height / (float)screen_width - 0.5625 > 0.01) {
-			current_button_state.x = (event->x + 155) * 960 / 1270 * screen_scale_ratio1;
-		}*/
-	}
-#endif
     if ( event_mode & WAIT_BUTTON_MODE ){
         mouseOverCheck( current_button_state.x, current_button_state.y );
         if (getmouseover_flag &&
@@ -473,6 +459,7 @@ bool ONScripter::mousePressEvent( SDL_MouseButtonEvent *event )
 
     current_button_state.x = event->x * screen_scale_ratio1;
     current_button_state.y = event->y * screen_scale_ratio2;
+
     current_button_state.down_flag = false;
     skip_mode &= ~SKIP_NORMAL;
 
@@ -546,6 +533,7 @@ bool ONScripter::mouseWheelEvent(SDL_MouseWheelEvent *event)
 
     current_button_state.x = event->x * screen_scale_ratio1;
     current_button_state.y = event->y * screen_scale_ratio2;
+
     current_button_state.down_flag = false;
     skip_mode &= ~SKIP_NORMAL;
 
@@ -762,14 +750,16 @@ void ONScripter::shiftCursorOnButton( int diff )
         if      (y < 0)              y = 0;
         else if (y >= screen_height) y = screen_height-1;
         x = x * screen_device_width / screen_width;
-        y = y * screen_device_width / screen_width;
+        y = y * screen_device_height / screen_height;
         shift_over_button = button->no;
         warpMouse(x, y);
+        // SDL_Log("ONScripter::shiftCursorOnButton (%d, %d)\n", x, y);
     }
 }
 
 bool ONScripter::keyDownEvent( SDL_KeyboardEvent *event )
 {
+    // SDL_Log("## ONScripter::keyDownEvent keysym=%d state=%s\n", event->keysym.sym, current_button_state.str);
     if (event->keysym.sym == SDLK_ESCAPE){
         current_button_state.event_type = SDL_MOUSEBUTTONDOWN;
         current_button_state.event_button = SDL_BUTTON_RIGHT;
@@ -1246,9 +1236,17 @@ void ONScripter::runEventLoop()
 #if defined(IOS) || defined(ANDROID) || defined(WINRT) || defined(PSV) 
         case SDL_FINGERMOTION:
         {
+#if defined(PSV)
+            if(strcmp(touchMode, "use_front_only_touch")==0)
+            {
+                if(event.ctouchpad.which!=0) break;  // 0 front, 1 back
+            }
+#endif
             if (!btndown_flag && convTouchKey(event.tfinger)) return;
             tmp_event.motion.x = device_width * event.tfinger.x - (device_width - screen_device_width) / 2;
             tmp_event.motion.y = device_height * event.tfinger.y - (device_height - screen_device_height) / 2;
+            // SDL_Log("## SDL_FINGERDOWN event.tfinger(%f, %f), tmp_event.button(%d, %d)\n", 
+            //     event.tfinger.x, event.tfinger.y, tmp_event.motion.x, tmp_event.motion.y);
             if (mouseMoveEvent( &tmp_event.motion )) return;
             if (btndown_flag){
                 event.button.type = SDL_MOUSEBUTTONDOWN;
@@ -1264,6 +1262,12 @@ void ONScripter::runEventLoop()
             break;
         case SDL_FINGERDOWN:
         {
+#if defined(PSV)
+            if(strcmp(touchMode, "use_front_only_touch")==0)
+            {
+                if(event.ctouchpad.which!=0) break; 
+            }
+#endif
             convTouchKey(event.tfinger);
             tmp_event.motion.x = device_width * event.tfinger.x - (device_width - screen_device_width) / 2;
             tmp_event.motion.y = device_height * event.tfinger.y - (device_height - screen_device_height) / 2;
@@ -1289,6 +1293,12 @@ void ONScripter::runEventLoop()
             break;
         case SDL_FINGERUP:
         {
+#if defined(PSV)
+            if(strcmp(touchMode, "use_front_only_touch")==0)
+            {
+                if(event.ctouchpad.which!=0) break; 
+            }
+#endif
             if (num_fingers == 0) break;
             {
                 tmp_event.button.type = SDL_MOUSEBUTTONUP;
@@ -1308,14 +1318,7 @@ void ONScripter::runEventLoop()
 #endif
 #if !defined(ANDROID) && !defined(IOS) && !defined(WINRT)
           case SDL_MOUSEMOTION:
-#if defined(PSV)
-			tmp_event.motion.x = event.motion.x * scale_ratio;
-			tmp_event.motion.y = event.motion.y * scale_ratio;
-			//utils::printInfo("x %d y %d  ox %d rx %d\n", tmp_event.motion.x, tmp_event.motion.y, event.motion.x,render_view_rect.x);
-			if (mouseMoveEvent(&tmp_event.motion, false)) return;
-#else
             if (mouseMoveEvent( &event.motion )) return;
-#endif
             if (btndown_flag){
                 if (event.motion.state & SDL_BUTTON(SDL_BUTTON_LEFT))
                     tmp_event.button.button = SDL_BUTTON_LEFT;
@@ -1452,7 +1455,7 @@ void ONScripter::runEventLoop()
 #if defined(ANDROID) || defined(PSV) 
                   if (compatibilityMode) repaintCommand();
                   // thats why window size changes !!!
-                  SDL_SetWindowSize( window, screen_device_width, screen_device_height);
+                  // SDL_SetWindowSize( window, screen_device_width, screen_device_height);
                   repaintCommand();
 #endif //ANDROID
                   break;

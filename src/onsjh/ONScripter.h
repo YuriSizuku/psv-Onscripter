@@ -564,11 +564,8 @@ public:
 private:
     bool waitEvent(int count);
     bool trapHandler();
-#if defined(PSV)
-	bool mouseMoveEvent(SDL_MouseMotionEvent *event, bool is_finger);
-#else
+
 	bool mouseMoveEvent(SDL_MouseMotionEvent *event);
-#endif
     bool mousePressEvent( SDL_MouseButtonEvent *event );
 
     bool mouseWheelEvent(SDL_MouseWheelEvent *event);

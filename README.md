@@ -6,7 +6,7 @@ Maintained by Yurisizuku, optimizing code structure and adding more features.
 
 - [x] make better structure by cmake
 - [x] fix bugs in new vitasdk and rendering problems
-- [ ] fix bugs for joystick and touching event
+- [x] fix bugs for joystick and touching event (this is caused by the scale ratio in y)
 - [ ] ci in github  action to automaticly build
 - [ ] support `nt2`, `nt3` script format
 - [ ] support mpeg video
@@ -14,14 +14,16 @@ Maintained by Yurisizuku, optimizing code structure and adding more features.
 ...
 
 ![vitaons_test1](./screenshot/vitaons_test2.jpg)
+![vitaons_test1](./screenshot/vitaons_test3.jpg)
+![vitaons_test1](./asset/bg.png)
 
-My other mod for emulators:
+My other mod for emulators:  
 [Mine_v1.5_yuri in andorid](https://github.com/YuriSizuku/Kirikiroid2/releases/download/1.3.9_yuri/Kirikiroid2_yuri_1.3.9.apk)  
 [Krkrdorid in andorid](https://github.com/YuriSizuku/Kirikiroid2/releases/download/1.3.9_yuri/Kirikiroid2_yuri_1.3.9.apk)  
 
 ## 1. build
 
-Instal [vitasdk](https://vitasdk.org/) first, and then use these script to build and debug. I tested it in windows msys sh enviroment.
+Instal [vitasdk](https://vitasdk.org/) first, and then use these script to build and debug. I tested it in windows msys sh enviroment.  
 
 ```sh
 # build script
@@ -35,6 +37,8 @@ sh build_vitavpk.sh all && sh send_vitaeboot.sh 10.2.12.6
 ## 2. usage
 
 See original informations.  
+
+## 3. konwn issues
 
 ------
 Original informations by [wetor](https://github.com/wetor/ONScripter-jh-PSVita).  

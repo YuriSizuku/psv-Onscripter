@@ -44,7 +44,6 @@ SarReader::~SarReader()
 
 int SarReader::open( const char *name )
 {
-    printf("## SarReader::open %s\n", name);
     ArchiveInfo* info = new ArchiveInfo();
 
     if ( (info->file_handle = fopen( name, "rb" ) ) == NULL ){

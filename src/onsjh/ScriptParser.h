@@ -4,7 +4,7 @@
  *
  *  Copyright (c) 2001-2016 Ogapee. All rights reserved.
  *            (C) 2014-2016 jh10001 <jh10001@live.cn>
- *            (C) 2019-2019 wetor(ÒÀ¾ÉWÈç´Ë) <maho.wang>
+ *            (C) 2019-2019 wetor(ï¿½ï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½) <maho.wang>
  *
  *  ogapee@aqua.dti2.ne.jp
  *
@@ -275,6 +275,7 @@ protected:
     /* Global definitions */
 #if defined(PSV)
 	float scale_ratio;
+    int screen_device_shiftx, screen_device_shifty;
 #endif
     int screen_ratio1, screen_ratio2;
     int screen_width, screen_height;
