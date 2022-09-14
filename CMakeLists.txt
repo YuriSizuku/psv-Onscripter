@@ -24,19 +24,20 @@ set(VITA_PACK_ARGS
   -s ${CMAKE_CURRENT_BINARY_DIR}/param.sfo
   -a ${CMAKE_CURRENT_SOURCE_DIR}/asset/default.ttf=default.ttf
   -a ${CMAKE_CURRENT_SOURCE_DIR}/asset/icon0.png=sce_sys/icon0.png
+  -a ${CMAKE_CURRENT_SOURCE_DIR}/asset/icon1.png=sce_sys/icon1.png
   -a ${CMAKE_CURRENT_SOURCE_DIR}/asset/bg.png=sce_sys/livearea/contents/bg.png
   -a ${CMAKE_CURRENT_SOURCE_DIR}/asset/logo.png=sce_sys/livearea/contents/logo.png
   -a ${CMAKE_CURRENT_SOURCE_DIR}/asset/startup.png=sce_sys/livearea/contents/startup.png
   -a ${CMAKE_CURRENT_SOURCE_DIR}/asset/template.xml=sce_sys/livearea/contents/template.xml 
 )
 set(VITA_PACK_ARGS ${VITA_PACK_ARGS} 
-  -a ${CMAKE_CURRENT_BINARY_DIR}/src/onsjh/onsjh.self=module/onsjh.self)
+  -a ${CMAKE_CURRENT_BINARY_DIR}/src/onsjh/onsjh.self=onsjh.bin)
 # set(VITA_PACK_ARGS ${VITA_PACK_ARGS} 
 #   -a ${CMAKE_CURRENT_BINARY_DIR}/src/onsjh/onsjh.suprx=module/onsjh.suprx)
-set(VITA_PACK_ARGS ${VITA_PACK_ARGS} 
-  -b ${CMAKE_CURRENT_BINARY_DIR}/src/onsjh/onsjh.self)
 # set(VITA_PACK_ARGS ${VITA_PACK_ARGS} 
-#   -b ${CMAKE_CURRENT_BINARY_DIR}/src/onsjh_vitagui/onsjh_vitagui.self)
+#   -b ${CMAKE_CURRENT_BINARY_DIR}/src/onsjh/onsjh.self)
+set(VITA_PACK_ARGS ${VITA_PACK_ARGS} 
+  -b ${CMAKE_CURRENT_BINARY_DIR}/src/onsjh_vitagui/onsjh_vitagui.self)
 
 add_custom_target(vpk
   echo "prepare for making ${PROJECT_NAME}.vpk ..."

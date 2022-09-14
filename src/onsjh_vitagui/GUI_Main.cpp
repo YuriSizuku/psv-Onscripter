@@ -39,7 +39,8 @@
 #include "iniparser.h"
 
 using namespace std;
-#define ONSJH_PATH "app0:module/onsjh.self"
+// must use app0:xxx.bin
+#define ONSJH_PATH "app0:onsjh.bin"
 
 extern unsigned char _binary_res_logo_png_start;
 extern unsigned char _binary_res_logo_png_size;
@@ -76,7 +77,7 @@ ONS-jh-PSV 　　 <wetor>\n\n\
 　　<2929339419@qq.com>\n\
 　　　 http://maho.wang\n\
 　　　 请不要吐槽界面...\n\n\
-maintained by <Yurisiziku>\n\
+maintained by Yurisiziku, \n\
 https://github.com/YuriSizuku/psv-Onscripter\n";
 
 int game_start_select = -1;
@@ -221,9 +222,9 @@ void draw_title() {
 	vita2d_draw_rectangle(0, 0,
 		ITEMS_PANEL_WIDTH, HEADER_HEIGHT, BLACK_1);
 	char *ver_str = new char[256];
-	sprintf(ver_str, "ONScripter-Jh for PSVita %s (GUI %d, Jh %s, %s, %d.%02d)\n", 
+	sprintf(ver_str, "Vita ONScripter-Jh (yuri) %s (GUI %d, Jh %s, %d.%02d)\n", 
 		ONS_JH_VITA_VERSION, GUI_VERSION, ONS_JH_VERSION, 
-		ONS_VERSION, NSC_VERSION / 100, NSC_VERSION % 100);
+		NSC_VERSION / 100, NSC_VERSION % 100);
 	
 	char time_str[16];
 	SceDateTime time;
@@ -1154,7 +1155,7 @@ int game_shortcut(int choose) {
 //temp:EBOOT
 	sceIoMkdir(path.c_str(), 0777);
 	copyFile("app0:eboot.bin", (path + "/eboot.bin").c_str());//EBOOT
-	copyFile("app0:ons.bin", (path + "/ons.bin").c_str());//ons
+	copyFile("app0:onsjh.bin", (path + "onsjh.bin").c_str());//ons
 	char *src_path = new char[64];
 	char *dst_path = new char[64];
 	char *tmp_str = new char[512];
@@ -1328,7 +1329,7 @@ int unload_ui_start(string &rom_path) {
 
 int main() 
 {
-	printf("ONScripter-Jh for Vita version %s (Jh %s, %s, %d.%02d)\n", 
+	printf("ONScripter-Jh for Vita version %s (Jh %s, %d.%02d)\n", 
 		ONS_JH_VITA_VERSION, ONS_JH_VERSION, ONS_VERSION, 
 		NSC_VERSION / 100, NSC_VERSION % 100);
 

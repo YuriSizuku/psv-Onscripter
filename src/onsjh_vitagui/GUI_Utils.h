@@ -63,7 +63,7 @@ public:
 			sceIoClose(fd);
 		}
 		else
-			icon = vita2d_load_PNG_file("app0:/sce_sys/icon0.png");
+			icon = vita2d_load_PNG_file("app0:/sce_sys/icon1.png");
 		/*if (icon == NULL)
 			icon = vita2d_load_PNG_file("app0:/sce_sys/icon0.png"); vita2d_create_empty_texture(dst_size, dst_size);*/
 		

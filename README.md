@@ -1,7 +1,8 @@
-# ONScripter-jh-PSVita
+# ONScripter-jh-PSVita (yuri)  
+
 ![psv-ons](https://img.shields.io/badge/psv-onscripter-brightgreen)  ![GitHub release (latest by date)](https://img.shields.io/github/v/release/Yurisizuku/psv-OnscripterJH?color=green&logoColor=red&style=flat-square)
 
-This is a ONScripter SDL 2.0 version, implemmented in psv.  
+This is an ONScripter JH (SDL2) project, ported to psv.  
 Maintained by Yurisizuku, optimizing code structure and adding more features.
 
 - [x] make better structure by cmake
@@ -36,7 +37,8 @@ sh build_vitavpk.sh all && sh send_vitaeboot.sh 10.2.12.6
 
 ## 2. usage
 
-See original informations.  
+put ons games into `ux0:onsemu/` and enjoy 🍀  
+See original informations in details.  
 
 ## 3. konwn issues
 
