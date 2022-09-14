@@ -26,6 +26,7 @@ include_directories(
 
 link_directories(
   ${CMAKE_CURRENT_BINARY_DIR}
+  $ENV{VITASDK}/arm-vita-eabi/lib
 )
 
 add_executable(${PROJECT_NAME}
@@ -111,7 +112,7 @@ target_link_libraries(${PROJECT_NAME}
   dl
   pthread
   SceSblSsMgr_stub
-  taiHen_stub
+  taihen_stub
 )
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE

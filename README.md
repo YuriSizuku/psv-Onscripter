@@ -24,9 +24,13 @@ My other mod for emulators:
 
 ## 1. build
 
-Instal [vitasdk](https://vitasdk.org/) first, and then use these script to build and debug. I tested it in windows msys sh enviroment.  
+Instal [vitasdk](https://vitasdk.org/) first, and then use these script to build and debug.  
+I tested it with windows msys `sh` and linux `bash`.  
 
 ```sh
+#install vitasdk
+sh ./script/install_vitasdk.sh [vitasdkdir]
+
 # build script
 sh ./script/build_vitavpk.sh vpk [vitasdkdir]
 
