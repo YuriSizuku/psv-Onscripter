@@ -1,0 +1,47 @@
+name: vita_onsjh
+on:
+  push: {tags:  ['v*']} #  Push events to matching v*, i.e. v1.0, v20.15.10
+env:
+  VITASDK: /opt/vitasdk
+jobs:
+  install_vitasdk:
+    runs-on: ubuntu-latest # default batch, powershell
+    steps:
+    - uses: actions/checkout@v3
+    - name: check or make vitasdk cache
+      id: check_vitasdk
+      uses: actions/cache@v3
+      with: 
+        path: ${{ env.VITASDK }} 
+        key: vitasdk
+    - name: install vitasdk
+      if: steps.check_vitasdk.outputs.cache-hit != 'true'
+      run: cd ./script && bash install_vitasdk.sh ${{ env.VITASDK }}
+
+  build_vitaonsjh:
+    runs-on: ubuntu-latest
+    needs: install_vitasdk
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup cmake
+      uses: jwlawson/actions-setup-cmake@v1.12
+      with:
+        cmake-version: '3.16.x' # the default cmake has error! to generate like onsjh.self-self
+    - name: get vitasdk cache
+      uses: actions/cache@v3
+      with: 
+        path: ${{ env.VITASDK }} 
+        key: vitasdk
+    - name: build vpk
+      run: cd ./script && bash build_vitavpk.sh vpk
+    # - name: upload build
+    #   uses: actions/upload-artifact@v3
+    #   with:
+    #     name: build
+    #     path: build/
+    - name: create a release
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: "./build/VitaOns.vpk"
+        allowUpdates: "true"
+        token: ${{ secrets.GITHUB_TOKEN }}

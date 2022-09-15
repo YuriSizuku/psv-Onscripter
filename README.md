@@ -8,7 +8,7 @@ Maintained by Yurisizuku, optimizing code structure and adding more features.
 - [x] make better structure by cmake
 - [x] fix bugs in new vitasdk and rendering problems
 - [x] fix bugs for joystick and touching event (this is caused by the scale ratio in y)
-- [ ] ci in github  action to automaticly build
+- [x] ci in github  action to automaticly build
 - [ ] support `nt2`, `nt3` script format
 - [ ] support mpeg video
 - [ ] make compatible game list

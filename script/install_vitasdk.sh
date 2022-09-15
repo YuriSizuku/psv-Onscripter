@@ -8,12 +8,15 @@ if [ -n "$(uname -a | grep Linux)" ]; then
 fi
 
 # prepare env
-if [ -z $1 ]; then export VITASDK=/opt/vitasdk; fi
+if [ -z $1 ]; then 
+    export VITASDK=/opt/vitasdk
+else
+    export VITASDK=$1
+fi
 export PATH=$VITASDK/bin:$PATH
 echo "config VITASDK=$VITASDK"
 
 # install vitasdk
-if ! [ -d build ]; then mkdir build; fi
 git clone https://github.com/vitasdk/vdpm ./../build/vpdm
 pushd ./../build/vpdm
 ./bootstrap-vitasdk.sh

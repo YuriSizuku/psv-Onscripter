@@ -43,6 +43,5 @@ add_custom_target(vpk
   echo "prepare for making ${PROJECT_NAME}.vpk ..."
   COMMAND vita-mksfoex -s APP_VER=${VITA_VERSION} -s TITLE_ID=${VITA_TITLEID} ${VITA_APP_NAME} ${CMAKE_CURRENT_BINARY_DIR}/param.sfo
   COMMAND vita-pack-vpk ${VITA_PACK_ARGS} ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.vpk
-  # DEPENDS onsjh.suprx onsjh_vitagui.self
   DEPENDS onsjh.self onsjh_vitagui.self
 )
