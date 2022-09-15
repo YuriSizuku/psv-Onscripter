@@ -46,6 +46,9 @@ See original informations in details.
 
 ## 3. konwn issues
 
+- [x] cmake 3.24.2 generate wrong target (like `onsjh.self-self`), use 3.16.x instead.  
+  solved by [branch cmake](https://github.com/vitasdk/vita-toolchain/issues/215)
+
 ------
 Original informations by [wetor](https://github.com/wetor/ONScripter-jh-PSVita).  
 Thank you for providing the code and makefiles to this project.

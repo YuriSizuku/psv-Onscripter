@@ -39,9 +39,15 @@ set(VITA_PACK_ARGS ${VITA_PACK_ARGS}
 set(VITA_PACK_ARGS ${VITA_PACK_ARGS} 
   -b ${CMAKE_CURRENT_BINARY_DIR}/src/onsjh_vitagui/onsjh_vitagui.self)
 
+if(${CMAKE_VERSION} VERSION_LESS "3.20.0")
+  set(VITAONS_DEPENDS onsjh.self onsjh_vitagui.self)
+else()
+  set(VITAONS_DEPENDS onsjh.self-self onsjh_vitagui.self-self)
+endif()
+
 add_custom_target(vpk
   echo "prepare for making ${PROJECT_NAME}.vpk ..."
   COMMAND vita-mksfoex -s APP_VER=${VITA_VERSION} -s TITLE_ID=${VITA_TITLEID} ${VITA_APP_NAME} ${CMAKE_CURRENT_BINARY_DIR}/param.sfo
   COMMAND vita-pack-vpk ${VITA_PACK_ARGS} ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.vpk
-  DEPENDS onsjh.self onsjh_vitagui.self
+  DEPENDS ${VITAONS_DEPENDS}
 )
