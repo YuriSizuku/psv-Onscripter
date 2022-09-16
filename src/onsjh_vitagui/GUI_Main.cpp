@@ -1329,7 +1329,7 @@ int unload_ui_start(string &rom_path) {
 
 int main() 
 {
-	printf("ONScripter-Jh for Vita version %s (Jh %s, %d.%02d)\n", 
+	printf("ONScripter-Jh for Vita version %s (Jh %s, ons %s, %d.%02d)\n", 
 		ONS_JH_VITA_VERSION, ONS_JH_VERSION, ONS_VERSION, 
 		NSC_VERSION / 100, NSC_VERSION % 100);
 

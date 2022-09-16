@@ -14,9 +14,9 @@ Maintained by Yurisizuku, optimizing code structure and adding more features.
 - [ ] make compatible game list
 ...
 
-![vitaons_test1](./screenshot/vitaons_test2.jpg)
-![vitaons_test1](./screenshot/vitaons_test3.jpg)
-![vitaons_test1](./asset/bg.png)
+![vitaons_test2](./screenshot/vitaons_test2.jpg)
+![vitaons_test3](./screenshot/vitaons_test3.jpg)
+![vitaons_bg](./asset/bg.png)
 
 My other mod for emulators:  
 [Mine_v1.5_yuri in andorid](https://github.com/YuriSizuku/Kirikiroid2/releases/download/1.3.9_yuri/Kirikiroid2_yuri_1.3.9.apk)  
@@ -41,13 +41,19 @@ sh build_vitavpk.sh all && sh send_vitaeboot.sh 10.2.12.6
 
 ## 2. usage
 
-put ons games into `ux0:onsemu/` and enjoy 🍀  
+Put ons games into `ux0:onsemu/` and enjoy 🍀  
+The game directory should not contain non-asci charactors.  
 See original informations in details.  
+
+![vitaons_mo2](screenshot/vitaons_mo2.png)
 
 ## 3. konwn issues
 
 - [x] cmake 3.24.2 generate wrong target (like `onsjh.self-self`), use 3.16.x instead.  
-  solved by [branch cmake](https://github.com/vitasdk/vita-toolchain/issues/215)
+  Solved by [branch cmake](https://github.com/vitasdk/vita-toolchain/issues/215)  
+- [x] Some game `*** can't load file [fgimage/CGTM16.png] Out of memory ***`  
+    This is because vita homebrew heap size has restriction to 32M.  
+    Solved by override [strbrk](https://gitee.com/yizhigai/onscripter-vita/blob/master/onscripter/vita/sbrk.c)  
 
 ------
 Original informations by [wetor](https://github.com/wetor/ONScripter-jh-PSVita).  

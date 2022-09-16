@@ -30,6 +30,7 @@ link_directories(
 )
 
 add_executable(${PROJECT_NAME}
+  ./../common/sbrk.c # use this to solve heap alloc restriction
   AnimationInfo.cpp
   DirectReader.cpp
   DirtyRect.cpp
@@ -71,7 +72,7 @@ target_link_libraries(${PROJECT_NAME}
   SDL2_mixer
   SDL2_ttf
   SDL2_image
-  SDL2 mikmod
+  SDL2
 
   vita2d
   vita2d_ext
@@ -86,6 +87,7 @@ target_link_libraries(${PROJECT_NAME}
   z
   SceNetCtl_stub 
   SceNet_stub
+  ScePaf_stub 
 
   FLAC
   FLAC++
@@ -93,6 +95,7 @@ target_link_libraries(${PROJECT_NAME}
   vorbisfile
   vorbis
   ogg
+  mikmod
   modplug
   SceAudioIn_stub
   SceAudio_stub
@@ -118,7 +121,7 @@ target_link_libraries(${PROJECT_NAME}
 target_compile_definitions(${PROJECT_NAME} PRIVATE
   -DPSV # -DPSV_MODULE
   -DUSE_SDL_RENDERER -DUSE_OGG_VORBIS -DUSE_LUA
-  -DUSE_SIMD_ARM_NEON -DUSE_SIMD
+  -DUSE_SIMD -DUSE_SIMD_ARM_NEON # -DUSE_STB
   -DUSE_BUILTIN_EFFECTS -DUSE_BUILTIN_LAYER_EFFECTS
   -DUSE_PARALLEL
 )

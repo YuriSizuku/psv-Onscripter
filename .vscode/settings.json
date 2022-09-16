@@ -34,6 +34,7 @@
         "sstream": "cpp",
         "streambuf": "cpp",
         "system_error": "cpp",
-        "fstream": "cpp"
+        "fstream": "cpp",
+        "new": "cpp"
     }
 }

@@ -32,6 +32,13 @@
 #ifdef USE_SIMD
 #include "simd/simd.h"
 #endif
+#ifdef USE_STB
+#define STBI_NEON
+#define STBI_ONLY_PNG
+#define STBI_FAILURE_USERMSG 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+#endif
 
 SDL_Surface *ONScripter::loadImage(char *filename, bool *has_alpha, int *location, unsigned char *alpha)
 {
@@ -130,6 +137,29 @@ SDL_Surface *ONScripter::createRectangleSurface(char *filename, bool *has_alpha,
     return tmp;
 }
 
+#ifdef USE_STB
+// fill 'data' with 'size' bytes.  return number of bytes actually read
+int read_cb (void *user, char *data, int size) 
+{
+    return SDL_RWread((SDL_RWops*)user, data, 1, size);
+}
+
+ // skip the next 'n' bytes, or 'unget' the last -n bytes if negative
+void skip_cb(void *user, int n)
+{
+    SDL_RWseek((SDL_RWops*)user, n, RW_SEEK_CUR);
+}
+
+// returns nonzero if we are at end of file/data
+int eof_cb(void *user) 
+{
+    Sint64 cur = SDL_RWtell((SDL_RWops*)user);
+    Sint64 end = SDL_RWseek((SDL_RWops*)user, 0, RW_SEEK_END);
+    SDL_RWseek((SDL_RWops*)user, cur, RW_SEEK_SET);
+    return cur >= end;
+}
+#endif
+
 SDL_Surface *ONScripter::createSurfaceFromFile(char *filename, bool *has_alpha, int *location)
 {
     unsigned long length = script_h.cBR->getFileLength( filename );
@@ -183,12 +213,45 @@ SDL_Surface *ONScripter::createSurfaceFromFile(char *filename, bool *has_alpha, 
             *has_alpha = false;
     }
 
-    SDL_RWclose(src);
-
-    if (buffer != tmp_image_buf) delete[] buffer;
-
     if (!tmp)
-        utils::printError(" *** can't load file [%s] %s ***\n", filename, IMG_GetError());
+    {
+        // void *buf = sce_paf_malloc(800*600*4);
+        // SDL_Log("##### buf=%p\n", buf);
+        // free(buf);
+#ifdef USE_STB
+        if(src)
+        {
+            int w=0, h=0, c=0;
+            stbi_io_callbacks cbs = {&read_cb, &skip_cb, &eof_cb};
+            
+            SDL_RWseek(src, 0, RW_SEEK_SET);
+            int res = stbi_info_from_callbacks(&cbs, src,  &w, &h, &c);
+            utils::printInfo("*** USE_STB file [%s], INFO %d (%d, %d, %d) ***\n",  filename, res, w, h, c);
+            
+            SDL_RWseek(src, 0, RW_SEEK_SET);
+            stbi_uc *imgbuf = stbi_load_from_callbacks(&cbs, src, &w, &h, &c, 0);
+            utils::printInfo("*** USE_STB file [%s], IMAGE buf=%p (%d, %d, %d) ***\n", 
+filename, imgbuf, w, h, c);
+            if(imgbuf) 
+            {
+                tmp = SDL_CreateRGBSurfaceFrom(imgbuf, w, h, 8, w*c, 0, 0, 0, 0);
+                stbi_image_free(imgbuf);
+            }
+            else
+            {
+                utils::printError(
+                    "*** USE_STB file [%s], stbi_load_from_callbacks failed, %s ***\n", 
+                    filename, stbi_failure_reason());
+            }
+        }
+            
+        if(!tmp)
+#endif
+        utils::printError(" *** can't load file [%s] %s, src=%p ***\n", filename, IMG_GetError(), src);
+    }
+    
+    SDL_RWclose(src);
+    if (buffer != tmp_image_buf) delete[] buffer;
 
     return tmp;
 }
