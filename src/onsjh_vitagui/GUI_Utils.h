@@ -58,17 +58,16 @@ public:
 		path = path_;
 		icon_path = path_ + "/icon.png";
 		SceUID fd = sceIoOpen(char_icon_path(), SCE_O_RDONLY, 0777);
-		if (fd > 0) {
+		if (fd > 0) 
+		{
 			icon = vita2d_load_PNG_file(char_icon_path());
 			sceIoClose(fd);
 		}
 		else
+		{
 			icon = vita2d_load_PNG_file("app0:/sce_sys/icon1.png");
-		/*if (icon == NULL)
-			icon = vita2d_load_PNG_file("app0:/sce_sys/icon0.png"); vita2d_create_empty_texture(dst_size, dst_size);*/
-		
-		/*w = vita2d_texture_get_width(icon);
-		h = vita2d_texture_get_height(icon);*/
+		}
+			
 		FILE *fp = fopen((path_ + "/caption.txt").c_str(), "r");
 		if (fp)
 		{
@@ -79,7 +78,10 @@ public:
 			fclose(fp);
 		}
 		else
-			name = "";
+		{
+			name = path_.substr(path_.find_last_of("/\\") + 1);
+		}
+			
 		w = sceGxmTextureGetWidth(&icon->gxm_tex);
 		h = sceGxmTextureGetHeight(&icon->gxm_tex);
 	}
@@ -115,12 +117,9 @@ public:
 	}
 };
 
-
-
 extern vector<RomInfo> rom_list;
 extern configure config;
 extern vita2d_font* font;
-
 
 void load_config();
 void save_config();

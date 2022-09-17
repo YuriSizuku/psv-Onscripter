@@ -9,9 +9,10 @@ Maintained by Yurisizuku, optimizing code structure and adding more features.
 - [x] fix bugs in new vitasdk and rendering problems
 - [x] fix bugs for joystick and touching event (this is caused by the scale ratio in y)
 - [x] ci in github  action to automaticly build
-- [ ] support `nt2`, `nt3` script format
+- [x] support nt2, [nt3](https://github.com/YuriSizuku/GalgameReverse/blob/master/src/onscripter/ons_decryptnt3.c) script format
 - [ ] support mpeg video
-- [ ] make compatible game list
+- [x] add English translation on the memu
+- [ ] test and make compatible game list
 ...
 
 ![vitaons_test2](./screenshot/vitaons_test2.jpg)
@@ -47,13 +48,13 @@ See original informations in details.
 
 ![vitaons_mo2](screenshot/vitaons_mo2.png)
 
-## 3. konwn issues
+## 3. konwn issues (including already solved)
 
 - [x] cmake 3.24.2 generate wrong target (like `onsjh.self-self`), use 3.16.x instead.  
   Solved by [branch cmake](https://github.com/vitasdk/vita-toolchain/issues/215)  
 - [x] Some game `*** can't load file [fgimage/CGTM16.png] Out of memory ***`  
-    This is because vita homebrew heap size has restriction to 32M.  
-    Solved by override [strbrk](https://gitee.com/yizhigai/onscripter-vita/blob/master/onscripter/vita/sbrk.c)  
+  This is because vita homebrew heap size has restriction to 32M.  
+  Solved by override [strbrk](https://gitee.com/yizhigai/onscripter-vita/blob/master/onscripter/vita/sbrk.c)  
 
 ------
 Original informations by [wetor](https://github.com/wetor/ONScripter-jh-PSVita).  

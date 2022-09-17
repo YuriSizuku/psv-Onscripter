@@ -54,18 +54,19 @@ int select_col = 0;
 int select_appinfo_button = 0;
 int select_slot = 0;
 int select_config = 0;
+int g_choose = -1;
 vita2d_font* font;
 const char* help_msg= "\
-使用帮助(游戏内)\n\n\
-○　　　　确认/继续\n\
-╳　　　　按住快进\n\
-□　　　　自动模式\n\
-△　　　　菜单/关闭回想模式\n\
-Ｌ　　　　快进当前页\n\
-Ｒ　　　　开启/停止快进\n\
-←→　　　回想模式选择\n\
-↑↓　　　选项/按钮选择\n\
-左摇杆　　等同方向键\n";
+使用帮助(游戏内) (help)\n\n\
+○　　　　确认/继续 (confirm)\n\
+╳　　　　按住快进 (skip)\n\
+□　　　　自动模式 (auto)\n\
+△　　　　菜单/关闭回想模式 (menu)\n\
+Ｌ　　　　快进当前页 (skip)\n\
+Ｒ　　　　开启/停止快进 (skip on)\n\
+←→　　　回想模式选择 (backlog)\n\
+↑↓　　　选项/按钮选择 (move cursor)\n\
+左摇杆　　等同方向键 (dpad)\n";
 
 const char* about_msg ="\
 　　　关于ONS for PSV\n\n\
@@ -77,7 +78,7 @@ ONS-jh-PSV 　　 <wetor>\n\n\
 　　<2929339419@qq.com>\n\
 　　　 http://maho.wang\n\
 　　　 请不要吐槽界面...\n\n\
-maintained by Yurisiziku, \n\
+maintained and new features by Yurisiziku, \n\
 https://github.com/YuriSizuku/psv-Onscripter\n";
 
 int game_start_select = -1;
@@ -87,21 +88,22 @@ int cmd[10] = {0};
 int cmd_num = 0;
 char *cmd_str[10];
 string sittings[] = {
-		"强制全屏幕",
-		"缓存字体",
-		"文字阴影",
-		"显示文字框",
-		"日文游戏",
+		"强制全屏幕 (full screen)",
+		"缓存字体 (cache font)",
+		"文字阴影 (text shadow)",
+		"显示文字框 (text box)",
+		"日文游戏 (enc: sjis)",
 		"",
 		"",
 		"",
-		"恢复默认设置",
-		"返回"
+		"恢复默认设置 (reset)",
+		"返回 (return)"
 };
 DrawListMode mainscreen_list_mode;
 
 void draw_icon(int curr, int row, int col) {
-	if (config.use_dpad && row == select_row && col == select_col) {
+	if (config.use_dpad && row == select_row && col == select_col) 
+	{
 		vita2d_draw_rectangle(ICON_LEFT(col) - ITEM_BOX_MARGIN,
 			ICON_TOP(row) - ITEM_BOX_MARGIN,
 			ICON_WIDTH + ITEM_BOX_MARGIN * 2,
@@ -148,6 +150,7 @@ void draw_icons(int curr) {
 
 void draw_list_row(int curr, int row) {
 	if (config.use_dpad && row == select_row) {
+		g_choose = curr;
 		vita2d_draw_rectangle(LIST_LEFT - ITEM_BOX_MARGIN,
 			LIST_TOP(row) - ITEM_BOX_MARGIN,
 			LIST_WIDTH + ITEM_BOX_MARGIN * 2,
@@ -242,9 +245,18 @@ void draw_help() {
 	// |-----helps----|
 	vita2d_draw_rectangle(0, FOOTER_TOP, ITEMS_PANEL_WIDTH, FOOTER_HEIGHT, BLACK_1);
 	if(rom_list.size() == 0)
-		vita2d_font_draw_text(font, 5, FOOTER_TOP + FONT_SIZE - 1, WHITE, FONT_SIZE, "无游戏！请把游戏放至ux0(uma0/ur0)下的onsemu/中");
+	{
+		vita2d_font_draw_text(font, 5, FOOTER_TOP + FONT_SIZE - 1, WHITE, FONT_SIZE, 
+			"No game! put game into ux0:onsemu/, uma0:onsemu/ or ur0:onsemu/");
+	}
 	else
-		vita2d_font_draw_text(font, 5, FOOTER_TOP + FONT_SIZE - 1, WHITE, FONT_SIZE , "L 打开设置菜单   R 查看帮助   Select 关于");
+	{
+		static char helpbuf[256];
+		snprintf(helpbuf, sizeof(helpbuf), 
+			"L 设置菜单 (menu)   R 查看帮助 (help)   Select 关于 (about)   |  %d/%d", 
+			g_choose + 1, rom_list.size());
+		vita2d_font_draw_text(font, 5, FOOTER_TOP + FONT_SIZE - 1, WHITE, FONT_SIZE , helpbuf);
+	}
 	vita2d_font_draw_text(font, ITEMS_PANEL_WIDTH - 120, FOOTER_TOP + FONT_SIZE - 1, WHITE, FONT_SIZE -2, GUI_VERSION_DATE);
 }
 
@@ -281,12 +293,13 @@ struct config_item {
 
 void draw_config() {
 	struct config_item items[] = {
-		{"显示模式",		 strcmp(config.list_mode,"icon") ? "列表" : "图标"},
-		{"仅使用按键",		 config.use_dpad ? "启用" : "关闭"},
-		{"图标模式行数",     RomInfo::to_char(config.icon_row)},
-		{"图标模式列数",     RomInfo::to_char(config.icon_col)},
-		{"列表模式行数",     RomInfo::to_char(config.list_row)},
-		{"游戏触摸控制",	 config.use_btouch == 0 ? "关闭" :(config.use_btouch == 1 ? "仅前触屏" : "前后触屏") }
+		{"显示(graphic mode)",		 strcmp(config.list_mode,"icon") ? "列表(list)" : "图标(icon)"},
+		{"仅按键(use dpad)",		 config.use_dpad ? "启用(on)" : "关闭(off)"},
+		{"图标行数(icon row)",     RomInfo::to_char(config.icon_row)},
+		{"图标列数(icon column)",     RomInfo::to_char(config.icon_col)},
+		{"列表行数(list row)",     RomInfo::to_char(config.list_row)},
+		{"触摸控制(touch mode)", 
+			config.use_btouch == 0 ? "关闭(close)" :(config.use_btouch == 1 ? "仅前触屏(only front touch)" : "前后触屏(both touch)") }
 	};
 
 	// FIXME: ugly UI
@@ -302,7 +315,7 @@ void draw_config() {
 			color = LIGHT_SLATE_GRAY;
 			
 		vita2d_font_draw_text(font, ITEMS_PANEL_LEFT + 10, ITEMS_PANEL_TOP + i * 30 + 30, color, FONT_SIZE, (char*)items[i].name);
-		vita2d_font_draw_text(font, ITEMS_PANEL_LEFT + 200, ITEMS_PANEL_TOP + i * 30 + 30, color, FONT_SIZE, (char*)items[i].value);
+		vita2d_font_draw_text(font, ITEMS_PANEL_LEFT + 300, ITEMS_PANEL_TOP + i * 30 + 30, color, FONT_SIZE, (char*)items[i].value);
 	}
 }
 
@@ -350,21 +363,21 @@ void draw_appinfo(ScreenState state, int choose) {
 	draw_appinfo_icon(choose);
 	draw_button(APPINFO_BUTTON_LEFT, APPINFO_BUTTON_TOP(0),
 		APPINFO_BUTTON_WIDTH, APPINFO_BUTTON_HEIGHT,
-		RomInfo::to_char("启动"), FONT_SIZE,
+		RomInfo::to_char("启动(start)"), FONT_SIZE,
 		(state == START_MODE));
 
 	draw_button(APPINFO_BUTTON_LEFT, APPINFO_BUTTON_TOP(1),
 		APPINFO_BUTTON_WIDTH, APPINFO_BUTTON_HEIGHT,
-		RomInfo::to_char("设置"), FONT_SIZE,
+		RomInfo::to_char("设置(config)"), FONT_SIZE,
 		(state == SETTING_MODE));
 	draw_button(APPINFO_BUTTON_LEFT, APPINFO_BUTTON_TOP(2),
 		APPINFO_BUTTON_WIDTH, APPINFO_BUTTON_HEIGHT,
-		RomInfo::to_char("制作气泡"), FONT_SIZE,
+		RomInfo::to_char("安装(install)"), FONT_SIZE,
 		(state == SHORTCUT_MODE));
 
 	draw_button(APPINFO_BUTTON_LEFT, APPINFO_BUTTON_TOP(3),
 		APPINFO_BUTTON_WIDTH, APPINFO_BUTTON_HEIGHT,
-		RomInfo::to_char("暂未开放"), FONT_SIZE,
+		RomInfo::to_char("comming soon"), FONT_SIZE,
 		(state == DELETE_MODE));
 
 	if (config.use_dpad && state == PRINT_APPINFO) {
@@ -378,8 +391,8 @@ void draw_appinfo(ScreenState state, int choose) {
 		APPINFO_DESC_WIDTH, APPINFO_DESC_HEIGHT,
 		LIGHT_SLATE_GRAY);
 
-	static int old_choose = -1;
 	static char tmp_str[512];
+	static int old_choose =  -1;
 
 	if (choose != old_choose) {
 		old_choose = choose;
@@ -388,7 +401,7 @@ void draw_appinfo(ScreenState state, int choose) {
 		char size_str[16];
 		getPathInfo(rom_list[choose].char_path(), &size, &floder_num, &file_num);
 		getSizeString(size_str, size);
-		sprintf(tmp_str, "名称：%s\n位置：%s\n大小：%s\n包含：%d个文件，%d个文件夹", rom_list[choose].char_name(), rom_list[choose].char_path(), size_str, file_num, floder_num);
+		sprintf(tmp_str, "name：%s\npath：%s\nsize：%s\nwith：%d files，%d folders", rom_list[choose].char_name(), rom_list[choose].char_path(), size_str, file_num, floder_num);
 	}
 
 	vita2d_font_draw_text(font,
@@ -426,7 +439,7 @@ void draw_slots(int index_, int slot) {
 			while (tmp.length() < 30)
 				tmp += " ";
 			tmp += "[";
-			tmp += cmd[i] ? "开启" : "关闭";
+			tmp += cmd[i] ? "开启(on)" : "关闭(off)";
 			tmp += "]";
 			if (cmd[i])
 				tmp += "●";
@@ -536,16 +549,16 @@ void draw_screen(ScreenState state, int curr, int choose, int slot) {
 		draw_message((char*)"[暂未开放的功能]", choose, FONT_SIZE);
 		break;
 	case SHORTCUT_MODE:
-		draw_message((char*)"是否要生成快捷启动气泡？", choose, FONT_SIZE);
+		draw_message((char*)"是否要生成快捷启动气泡？(Do you want to make package?)", choose, FONT_SIZE);
 		break;
 	case SHORTCUT_WAIT:
-		draw_alert((char*)"正在生成气泡中...请勿操作...", FONT_SIZE);
+		draw_alert((char*)"正在生成气泡中...请勿操作...(installing)", FONT_SIZE);
 		break;
 	case SHORTCUT_DONE_MODE:
-		draw_alert((char*)"快捷启动气泡生成完毕！", FONT_SIZE);
+		draw_alert((char*)"快捷启动气泡生成完毕！(install finish)", FONT_SIZE);
 		break;
 	case SHORTCUT_FAIL_MODE:
-		draw_alert((char*)"快捷启动气泡生成失败...", FONT_SIZE);
+		draw_alert((char*)"快捷启动气泡生成失败...(install failed)", FONT_SIZE);
 		break;
 	default:
 		break;
@@ -554,7 +567,6 @@ void draw_screen(ScreenState state, int curr, int choose, int slot) {
 	vita2d_end_drawing();
 	vita2d_wait_rendering_done();
 	vita2d_swap_buffers();
-
 }
 
 #define IN_RANGE(start, end, value) (start < value && value < end)
@@ -1119,7 +1131,6 @@ ScreenState on_alert_event(ScreenState state) {
 }
 
 int  game_delete(int choose) {
-
 	return 1;
 }
 
@@ -1235,7 +1246,7 @@ int mainloop() {
 	ScreenState state = MAIN_SCREEN;
 	int slot = -1;
 	while (1) {
-		draw_screen(state, curr, choose,slot);
+		draw_screen(state, curr, choose, slot);
 		ScreenState new_state = UNKNOWN;
 		while (1) {
 			switch (state) {
@@ -1365,10 +1376,10 @@ int main()
 		init_input();
 
 		confirm_msg = new char[256];
-		sprintf(confirm_msg, "%s 取消    %s 确定", ICON_CANCEL, ICON_ENTER);
+		sprintf(confirm_msg, "%s 取消(no)    %s 确定(yes)", ICON_CANCEL, ICON_ENTER);
 		confirm_msg_width = vita2d_font_text_width(font, FONT_SIZE, confirm_msg);
 		close_msg = new char[256];
-		sprintf(close_msg, "%s 关闭", ICON_ENTER);
+		sprintf(close_msg, "%s 关闭(close)", ICON_ENTER);
 		close_msg_width = vita2d_font_text_width(font, FONT_SIZE, close_msg);
 
 		//load_config();

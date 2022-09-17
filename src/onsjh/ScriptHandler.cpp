@@ -982,6 +982,13 @@ int ScriptHandler::readScript( char *path )
     else if ((fp = fopen("nscript.dat", "rb")) != NULL){
         encrypt_mode = 1;
     }
+    else if ((fp = fopen("onscript.nt2", "rb")) != NULL){
+        encrypt_mode = 4;
+    }
+    else if ((fp = fopen("onscript.nt3", "rb")) != NULL){
+        encrypt_mode = 5;
+    }
+    printf("## ScriptHandler::readScript encrypt_mode=%d\n", encrypt_mode);
 
     if (fp == NULL){
         utils::printError( "can't open any of 0.txt, 00.txt, nscript.dat and nscript.___\n");
@@ -1046,9 +1053,21 @@ int ScriptHandler::readScriptSub( FILE *fp, char **buf, int encrypt_mode )
     bool newline_flag = true;
     bool cr_flag = false;
     bool newlabel_flag = false;
+    int nt3_key, nt3_size, nt3_flag=1;
 
     if (encrypt_mode == 3 && !key_table_flag)
         errorAndExit("readScriptSub: the EXE file must be specified with --key-exe option.");
+    if (encrypt_mode ==5)
+    {
+        fseek(fp, 0, SEEK_END);
+        nt3_size = ftell(fp);
+        if(nt3_size<=0x920)
+        {
+            errorAndExit("readScriptSub: nt3 script must be large than 0x920 size");
+        }
+        fseek(fp, 0x91C, SEEK_SET);
+        fread(&nt3_key, 4, 1, fp); 
+    }
 
     size_t len=0, count=0;
     while(1){
@@ -1068,6 +1087,18 @@ int ScriptHandler::readScriptSub( FILE *fp, char **buf, int encrypt_mode )
         }
         else if ( encrypt_mode == 3){
             ch = key_table[(unsigned char)ch] ^ 0x84;
+        }
+        else if (encrypt_mode == 4) // onscript.nt2
+        {
+			ch^=(0x85&0x97);
+			ch -= 1;
+        }
+        else if (encrypt_mode == 5) // onscript.nt3
+        {
+            int pos = ftell(fp) + count -1;
+            nt3_key ^=  ch;
+            nt3_key +=  ch *(nt3_size-pos) + 0x5D588B65;
+            ch ^= nt3_key;
         }
 
         if ( cr_flag && ch != 0x0a ){

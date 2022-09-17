@@ -139,7 +139,7 @@
 #define FONT_SIZE 24
 
 #define GUI_VERSION 101
-#define GUI_VERSION_DATE "2022"
+#define GUI_VERSION_DATE ""
 
 extern int ICONS_ROW;
 extern int ICONS_COL;
