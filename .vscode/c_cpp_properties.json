@@ -10,6 +10,7 @@
                 "${workspaceFolder}/src/**",
                 "${workspaceFolder}/src/common/**",
                 "${workspaceFolder}/src/onsjh/simd/**",
+                "${workspaceFolder}/src/onsjh/aviwrapper/**",
                 "${vitasdk}/include",
                 "${vitasdk}/arm-vita-eabi/include/SDL2/**",
                 "${vitasdk}/arm-vita-eabi/include/**",

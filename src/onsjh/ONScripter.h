@@ -746,6 +746,7 @@ private:
     int playWave(Mix_Chunk *chunk, int format, bool loop_flag, int channel);
     int playMIDI(bool loop_flag);
     
+    int playAVC(const char *filename, bool click_flag, bool loop_flag=false);
     int playMPEG(const char *filename, bool click_flag, bool loop_flag=false);
     int playAVI( const char *filename, bool click_flag );
     enum { WAVE_PLAY        = 0,

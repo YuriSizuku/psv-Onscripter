@@ -3,16 +3,16 @@
 ![psv-ons](https://img.shields.io/badge/psv-onscripter-brightgreen)  ![GitHub release (latest by date)](https://img.shields.io/github/v/release/Yurisizuku/psv-OnscripterJH?color=green&logoColor=red&style=flat-square)
 
 This is an ONScripter JH (SDL2) project, ported to psv.  
-Maintained by Yurisizuku, optimizing code structure and adding more features.
+Maintained by Yurisizuku, optimizing code structure and adding more features. Such as video hardware decode support and nt2, nt3 format support.
 
 - [x] make better structure by cmake
 - [x] fix bugs in new vitasdk and rendering problems
 - [x] fix bugs for joystick and touching event (this is caused by the scale ratio in y)
 - [x] ci in github  action to automaticly build
-- [x] support nt2, [nt3](https://github.com/YuriSizuku/GalgameReverse/blob/master/src/onscripter/ons_decryptnt3.c) script format
-- [ ] support mpeg video
-- [x] add English translation on the memu
-- [ ] test and make compatible game list
+- [x] support nt2, [nt3](https://github.com/YuriSizuku/GalgameReverse/blob/master/src/onscripter/ons_decryptnt3.c) script format  
+- [x] support avc video with hardware decode  
+- [x] add English translation on the memu  
+- [ ] test and make compatible game list  
 ...
 
 ![vitaons_test2](./screenshot/vitaons_test2.jpg)
@@ -45,6 +45,13 @@ sh build_vitavpk.sh all && sh send_vitaeboot.sh 10.2.12.6
 Put ons games into `ux0:onsemu/` and enjoy 🍀  
 The game directory should not contain non-asci charactors.  
 See original informations in details.  
+
+❗The hardware decoder can only decode `avc yuv420p, aac, mp4` format video.  
+If other videos, you neet to convert them in advance.  (if fails, you can remove the video to continue)
+
+``` shell
+ffmpeg -i op.mpg -c:v libx264 -c:a aac -pix_fmt yuv420p op.mp4
+```
 
 ![vitaons_mo2](screenshot/vitaons_mo2.png)
 

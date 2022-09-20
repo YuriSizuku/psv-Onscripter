@@ -1357,7 +1357,11 @@ int ONScripter::mpegplayCommand()
     bool click_flag = (script_h.readInt()==1)?true:false;
 
     stopBGM( false );
+#if defined(PSV)
+    if (playAVC( save_buf, click_flag )) endCommand(); 
+#else
     if (playMPEG( save_buf, click_flag )) endCommand();
+#endif
 
     repaintCommand();
     
@@ -1545,8 +1549,11 @@ int ONScripter::movieCommand()
             script_h.readLabel();
         }
     }
-    
+#if defined(PSV)
+    if (playAVC( filename, click_flag, loop_flag)) endCommand(); 
+#else
     if (playMPEG(filename, click_flag, loop_flag)) endCommand();
+#endif
 
     return RET_CONTINUE;
 }
@@ -3813,7 +3820,11 @@ int ONScripter::aviCommand()
     bool click_flag = (script_h.readInt()==1)?true:false;
 
     stopBGM( false );
+#if defined(PSV)
+    if (playAVC( save_buf, click_flag )) endCommand();
+#else
     if (playAVI( save_buf, click_flag )) endCommand();
+#endif
 
     // should be commented out
     //repaintCommand();

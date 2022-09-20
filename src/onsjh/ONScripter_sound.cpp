@@ -241,6 +241,195 @@ static void smpeg_filter_destroy( struct SMPEG_Filter * filter )
 }
 #endif
 
+#if defined(PSV)
+// refered from https://github.com/SonicMastr/Vita-Media-Player/blob/main/src/avplayer/avplayer.c
+#include <malloc.h>
+#include <vitasdk.h>
+#define FRAMEBUFFER_ALIGNMENT  0x100000 // 0x40000
+#define ALIGN(x, a) (((x) + ((a) - 1)) & ~((a) - 1))
+static void *memalloc(void *p, uint32_t alignment, uint32_t size) 
+{
+	return memalign(alignment, size);
+}
+
+static void dealloc(void *p, void *ptr) 
+{
+	free(ptr);
+}
+
+static void *gpu_alloc(void *p, uint32_t alignment, uint32_t size) 
+{
+	void *base = NULL;
+	if (alignment < FRAMEBUFFER_ALIGNMENT) 
+    {
+		alignment = FRAMEBUFFER_ALIGNMENT;
+	}
+	size = ALIGN(size, alignment);
+#ifdef SYS_APP_MODE
+	size = ALIGN(size, 1024 * 1024);
+	SceUID memblock = sceKernelAllocMemBlock("Video Memblock", SCE_KERNEL_MEMBLOCK_TYPE_USER_MAIN_PHYCONT_NC_RW, size, NULL);
+#else
+	SceKernelAllocMemBlockOpt opt;
+	memset(&opt, 0, sizeof(opt));
+	opt.size = sizeof(SceKernelAllocMemBlockOpt);
+	opt.attr = SCE_KERNEL_ALLOC_MEMBLOCK_ATTR_HAS_ALIGNMENT;
+	opt.alignment = alignment;
+	SceUID memblock = sceKernelAllocMemBlock("avcblodk", SCE_KERNEL_MEMBLOCK_TYPE_USER_MAIN_PHYCONT_NC_RW, size, NULL);
+#endif
+	sceKernelGetMemBlockBase(memblock, &base);
+	int res = sceGxmMapMemory(base, size, SCE_GXM_MEMORY_ATTRIB_RW);
+    // printf("## alloc_gpu %p memblock=%x, sceGxmMapMemory res=%x, base=%x, align=0x%x, size=0x%x\n", p, memblock, res, base, alignment, size);
+	return base;
+}
+
+static void gpu_dealloc(void *p, void *ptr) 
+{
+	SceUID memblock = sceKernelFindMemBlockByAddr(ptr, 0);
+	sceKernelFreeMemBlock(memblock);
+}
+
+SceAvPlayerHandle g_avplayer = -1;
+static int aacaudio_thread(unsigned int args, void* arg)
+{
+    static volatile int audio_vol = 32767;
+	int ch = sceAudioOutOpenPort(SCE_AUDIO_OUT_PORT_TYPE_MAIN, 1024, 48000, SCE_AUDIO_OUT_MODE_STEREO);
+    printf("## sceAudioOutOpenPort %d\n", ch);
+	sceAudioOutSetConfig(ch, -1, -1, (SceAudioOutMode)-1);
+	
+	SceAvPlayerFrameInfo audio_frame;
+	memset(&audio_frame, 0, sizeof(SceAvPlayerFrameInfo));
+	
+	// Setting audio channel volume
+	int vol_stereo[] = {audio_vol, audio_vol};
+	sceAudioOutSetVolume(ch, (SceAudioOutChannelFlag)(SCE_AUDIO_VOLUME_FLAG_L_CH | SCE_AUDIO_VOLUME_FLAG_R_CH), vol_stereo);
+	
+	while (g_avplayer) 
+    {
+		if (sceAvPlayerIsActive(g_avplayer)) 
+        {
+			if (sceAvPlayerGetAudioData(g_avplayer, &audio_frame))
+            {
+				sceAudioOutSetConfig(ch, -1, audio_frame.details.audio.sampleRate, 
+                    audio_frame.details.audio.channelCount == 1 ? 
+                        SCE_AUDIO_OUT_MODE_MONO : SCE_AUDIO_OUT_MODE_STEREO);
+				sceAudioOutOutput(ch, audio_frame.pData);
+			} 
+            else 
+            {
+				sceKernelDelayThread(1000);
+			}
+		} 
+        else 
+        {
+			sceKernelDelayThread(1000);
+		}
+	}
+	
+	return sceKernelExitDeleteThread(0);
+}
+
+#endif
+
+int ONScripter::playAVC(const char *filename, bool click_flag, bool loop_flag)
+{
+    int ret = 0, _res = 0;
+    SDL_Log("## ONScripter::playAVC %s, click_flag=%d, loop_flag=%d\n", filename, click_flag, loop_flag);
+#if defined(PSV)
+    // checkout the video path
+    static char path[256];
+    static char basename[256];
+    strcpy(basename, filename);
+    char *cur = strrchr(basename, '.');
+    if(cur) *cur='\0';
+    snprintf(path, sizeof(path), "%s%s", archive_path, filename);
+    SceUID fd = sceIoOpen(path, SCE_O_RDONLY, 0777);
+    if(fd <= 0)
+    {
+        snprintf(path, sizeof(path), "%s%s.mp4", archive_path, basename);
+        fd = sceIoOpen(path, SCE_O_RDONLY, 0777);
+    }
+    if(fd>=0) sceIoClose(fd);
+
+    // initialize the video player
+    SDL_Texture *texture = NULL;
+    SDL_Rect dst_rect = {
+        (960 - screen_device_width)/2, 
+        (544 - screen_device_height)/2, 
+        screen_device_width, screen_device_height};
+    SceAvPlayerInitData avplayer_init;
+    SceAvPlayerFrameInfo frameinfo;
+    SceUID audio_thread;
+    
+    memset(&avplayer_init, 0, sizeof(SceAvPlayerInitData));
+    avplayer_init.memoryReplacement.allocate = memalloc;
+    avplayer_init.memoryReplacement.deallocate = dealloc;
+    avplayer_init.memoryReplacement.allocateTexture = gpu_alloc;
+    avplayer_init.memoryReplacement.deallocateTexture = gpu_dealloc;
+    avplayer_init.basePriority = 0xA0;
+	avplayer_init.numOutputVideoFrameBuffers = 2;
+    // avplayer_init.debugLevel = 3; //  for debug player
+	avplayer_init.autoStart = true;
+    _res = sceSysmoduleLoadModule(SCE_SYSMODULE_AVPLAYER);
+    SDL_Log("## sceSysmoduleLoadModule res=0x%08x\n", _res);
+    if(_res < 0) goto playAVC_end;
+    g_avplayer = sceAvPlayerInit(&avplayer_init);
+    SDL_Log("## sceAvPlayerInit handle=%p\n", g_avplayer);
+    _res = sceAvPlayerAddSource(g_avplayer, path);
+    SDL_Log("## sceAvPlayerAddSource [%s] res=0x%08x\n", path, _res);
+    if(_res < 0) goto playAVC_end;
+    
+    // decode the video
+    sceAvPlayerSetLooping(g_avplayer, loop_flag);
+	sceAvPlayerSetTrickSpeed(g_avplayer, 100);
+    sceKernelDelayThread(1000); // must have audio thread
+    audio_thread = sceKernelCreateThread("Vid Audio Thread", 
+        &aacaudio_thread, 0x10000100, 0x10000, 0, 0, NULL);
+    sceKernelStartThread(audio_thread, 0, NULL);
+    while(sceAvPlayerIsActive(g_avplayer))
+    {
+        if(sceAvPlayerGetVideoData(g_avplayer, &frameinfo))
+        {
+            int w = frameinfo.details.video.width;
+            int h = frameinfo.details.video.height;
+            uint64_t time = frameinfo.timeStamp;
+            uint8_t *framebuf = frameinfo.pData;
+
+            // SDL_Log("## sceAvPlayerGetVideoData buf=%p, time=%llu, %dX%d\n", framebuf, time, w, h);
+            if(!texture)
+            {
+                texture = SDL_CreateTexture(renderer, 
+                    SDL_PIXELFORMAT_YV12, SDL_TEXTUREACCESS_STREAMING, w, h);
+            }
+            void *pixels = NULL;
+            int pitch = 0;
+            SDL_LockTexture(texture, NULL, &pixels, &pitch);
+            memcpy(pixels, framebuf, w*h + w*h/4 + w*h/4); // for yuv420p, in seperate plane
+            SDL_UnlockTexture(texture);
+            SDL_RenderClear(renderer);
+            SDL_RenderCopy(renderer, texture, NULL, &dst_rect);
+            SDL_RenderPresent(renderer);
+        }
+        if(click_flag)
+        {
+            SDL_Event event;
+            while(SDL_PollEvent(&event))
+            {
+                if(event.type == SDL_JOYBUTTONDOWN)
+                {
+                    goto playAVC_end;
+                }
+            }
+        }
+    }
+    ret = 0;
+#endif
+playAVC_end:
+    if(g_avplayer>0)  sceAvPlayerClose(g_avplayer);
+    if(g_avplayer) g_avplayer = 0;
+    if(texture) SDL_DestroyTexture(texture);
+    return ret;
+}
+
 int ONScripter::playMPEG(const char *filename, bool click_flag, bool loop_flag)
 {
     unsigned long length = script_h.cBR->getFileLength( filename );

@@ -17,7 +17,7 @@ include("${VITASDK}/share/vita.cmake" REQUIRED)
 ## Configuration options for this app
 set(VITA_APP_NAME "Vita Ons")
 set(VITA_TITLEID  "VITAONSJH")
-set(VITA_VERSION  "00.50")
+set(VITA_VERSION  "00.51")
 
 # use this for custom target denpends
 set(VITA_PACK_ARGS 
