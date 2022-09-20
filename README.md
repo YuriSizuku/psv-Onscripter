@@ -46,8 +46,10 @@ Put ons games into `ux0:onsemu/` and enjoy 🍀
 The game directory should not contain non-asci charactors.  
 See original informations in details.  
 
-❗The hardware decoder can only decode `avc yuv420p, aac, mp4` format video.  
-If other videos, you neet to convert them in advance.  (if fails, you can remove the video to continue)
+❗The hardware decoder in psv can only decode `avc yuv420p, aac, mp4` format video.  
+If other videos, you need to convert them in advance.  
+(If decode fails, you can also remove the video to continue the game)  
+This engine will at first search the same video name with `.mp4` extension to decode.  
 
 ``` shell
 ffmpeg -i op.mpg -c:v libx264 -c:a aac -pix_fmt yuv420p op.mp4

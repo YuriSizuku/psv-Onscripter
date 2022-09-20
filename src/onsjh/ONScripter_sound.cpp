@@ -336,16 +336,18 @@ int ONScripter::playAVC(const char *filename, bool click_flag, bool loop_flag)
     SDL_Log("## ONScripter::playAVC %s, click_flag=%d, loop_flag=%d\n", filename, click_flag, loop_flag);
 #if defined(PSV)
     // checkout the video path
+    SceUID fd = -1;
     static char path[256];
     static char basename[256];
     strcpy(basename, filename);
     char *cur = strrchr(basename, '.');
     if(cur) *cur='\0';
-    snprintf(path, sizeof(path), "%s%s", archive_path, filename);
-    SceUID fd = sceIoOpen(path, SCE_O_RDONLY, 0777);
+
+    snprintf(path, sizeof(path), "%s%s.mp4", archive_path, basename);
+    fd = sceIoOpen(path, SCE_O_RDONLY, 0777);
     if(fd <= 0)
     {
-        snprintf(path, sizeof(path), "%s%s.mp4", archive_path, basename);
+        snprintf(path, sizeof(path), "%s%s", archive_path, filename);
         fd = sceIoOpen(path, SCE_O_RDONLY, 0777);
     }
     if(fd>=0) sceIoClose(fd);
@@ -416,17 +418,20 @@ int ONScripter::playAVC(const char *filename, bool click_flag, bool loop_flag)
             {
                 if(event.type == SDL_JOYBUTTONDOWN)
                 {
-                    goto playAVC_end;
+                     // press cross or start to skip video
+                    Uint8 button = event.jbutton.button;
+                    if(button == 2 || button == 11)
+                        goto playAVC_end;
                 }
             }
         }
     }
     ret = 0;
-#endif
 playAVC_end:
     if(g_avplayer>0)  sceAvPlayerClose(g_avplayer);
     if(g_avplayer) g_avplayer = 0;
     if(texture) SDL_DestroyTexture(texture);
+#endif
     return ret;
 }
 
