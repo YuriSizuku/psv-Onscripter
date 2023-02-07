@@ -1,6 +1,6 @@
 {
     "env" : {
-        "vitasdk": "d:/AppExtend/SDK/psvsdk"
+        "vitasdk": "d:/Software/env//sdk/psvsdk"
     },
     "configurations": [
         {

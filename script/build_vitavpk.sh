@@ -10,7 +10,7 @@ fi
 
 if [ -z $VITASDK ]; then
     if [ -z $2 ]; then
-        export VITASDK=/d/AppExtend/SDK/psvsdk
+        export VITASDK=/d/software/env/sdk/psvsdk
     else
         export VITASDK=$2
     fi

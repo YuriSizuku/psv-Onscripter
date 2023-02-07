@@ -1095,9 +1095,9 @@ int ScriptHandler::readScriptSub( FILE *fp, char **buf, int encrypt_mode )
         }
         else if (encrypt_mode == 5) // onscript.nt3
         {
-            int pos = ftell(fp) + count -1;
+            int pos = (ftell(fp) - 0x920) - len + count ;
             nt3_key ^=  ch;
-            nt3_key +=  ch *(nt3_size-pos) + 0x5D588B65;
+            nt3_key +=  ch *((nt3_size-0x920)+1-pos) + 0x5D588B65;
             ch ^= nt3_key;
         }
 
