@@ -22,6 +22,7 @@
                 "USE_PARALLEL",
                 "USE_SIMD",
                 "USE_SIMD_ARM_NEON",
+                "USE_LUA",
                 "USE_STB"
             ],
             "compilerPath": "${vitasdk}/bin/arm-vita-eabi-gcc",

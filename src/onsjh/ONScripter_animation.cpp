@@ -64,7 +64,7 @@ int ONScripter::calcDurationToNextAnimation()
     }
 
 #ifdef USE_LUA
-    if (lua_handler.is_animatable && !script_h.isExternalScript()){
+    if (lua_handler.is_animatable && script_h.isExternalScript()){
         if (min == 0 || min > lua_handler.next_time)
             min = lua_handler.next_time;
     }
@@ -84,7 +84,7 @@ void ONScripter::proceedAnimation(int current_time)
             flushDirect(sprite_info[i].pos, refreshMode() | (draw_cursor_flag?REFRESH_CURSOR_MODE:0));
 
 #ifdef USE_LUA
-    if (lua_handler.is_animatable && !script_h.isExternalScript()){
+    if (lua_handler.is_animatable && script_h.isExternalScript()){
         while(lua_handler.next_time <= current_time){
             int tmp_event_mode = event_mode;
             int tmp_next_time = next_time;
