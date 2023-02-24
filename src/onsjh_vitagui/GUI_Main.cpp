@@ -75,9 +75,6 @@ ONScripter-jh　　<jh10001>\n\
 vita-savemgr 　　<d3m3vilurr>\n\
 ONS-jh-PSV 　　 <wetor>\n\n\
 　　　wetor(@依旧W如此)\n\
-　　<2929339419@qq.com>\n\
-　　　 http://maho.wang\n\
-　　　 请不要吐槽界面...\n\n\
 maintained and new features by Yurisiziku, \n\
 https://github.com/YuriSizuku/psv-Onscripter\n";
 
